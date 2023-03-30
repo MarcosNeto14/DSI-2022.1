@@ -1,11 +1,39 @@
-// Copyright 2018 The Flutter team. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
 import 'package:flutter/material.dart';
+
+
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(const MyApp());
+
+final saved = <WordPair>[];
+
+class Favoritos extends StatelessWidget {
+  const Favoritos({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+      appBar: AppBar(
+        title: Text('Favoritos'),
+        actions: [
+          ElevatedButton(onPressed: () => Navigator.pop(context), child: Text('Voltar'))
+        ],
+      ),
+      body: ListView.builder(
+        itemCount: saved.length,
+        itemBuilder: (context, index) {
+          return ListTile(
+            title: Text(saved[index].asPascalCase),
+          );
+        }
+          ),
+          ),
+       );
+  }
+}
+
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -15,7 +43,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final saved = <WordPair>{};
+  
   final suggestions = <WordPair>[];
   final biggerFont = const TextStyle(fontSize: 18);
 
@@ -41,7 +69,6 @@ class _MyAppState extends State<MyApp> {
   }
 
   body(){
-
     if (viewType == 'list') {
       return ListView.builder(
         padding: const EdgeInsets.all(16.0),
@@ -54,16 +81,24 @@ class _MyAppState extends State<MyApp> {
           }
           final alreadySaved = saved.contains(suggestions[index]);
           return ListTile(
-              title: Text(
-                suggestions[index].asPascalCase,
-                style: biggerFont,
+              title: Container(
+                child: Dismissible(
+                  key: ObjectKey(suggestions[index].asPascalCase),
+                  child: Text(
+                    suggestions[index].asPascalCase,
+                    style: biggerFont,
+                  ),
+                  onDismissed: (direction) {
+                    setState(() {
+                    suggestions.removeAt(index);
+                    saved.removeAt(index);
+                     });  
+                  },
+                ),
               ),
-              trailing: Icon(
-                alreadySaved ? Icons.favorite : Icons.favorite_border,
-                color: alreadySaved ? Colors.red : null,
-                semanticLabel: alreadySaved ? 'Remove from saved' : 'Save',
-              ),
-              onTap: () {
+              trailing: IconButton(
+                icon: alreadySaved ? const Icon(Icons.favorite, color: Colors.red) : Icon(Icons.favorite_border),
+              onPressed: () {
                 setState(() {
                   if (alreadySaved){
                     saved.remove(suggestions[index]);
@@ -72,6 +107,7 @@ class _MyAppState extends State<MyApp> {
                   }
                 });
                 }
+              ),
           );
         },
       );
@@ -91,22 +127,6 @@ class _MyAppState extends State<MyApp> {
                 style: biggerFont,
                 )
                   ,)
-                
-              // ),
-              // trailing: Icon(
-              //   alreadySaved ? Icons.favorite : Icons.favorite_border,
-              //   color: alreadySaved ? Colors.red : null,
-              //   semanticLabel: alreadySaved ? 'Remove from saved' : 'Save',
-              // ),
-              // onTap: () {
-              //   setState(() {
-              //     if (alreadySaved) {
-              //       saved.remove(suggestions[i]);
-              //     } else {
-              //       saved.add(suggestions[i]);
-              //     }
-              //   });
-              // }
           );
         },
       );
@@ -118,7 +138,9 @@ class _MyAppState extends State<MyApp> {
 
 
     return MaterialApp(
-      home: Scaffold(
+      home: Builder(
+        builder: ((context) => 
+      Scaffold(
       appBar: AppBar(
           title: const Text('Startup Name Generator'),
           actions: [
@@ -126,9 +148,14 @@ class _MyAppState extends State<MyApp> {
               onPressed: botao,
               child: lista_card(),
             ),
+            IconButton(
+              icon: Icon(Icons.star, color: Colors.yellow,),
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const Favoritos())),
+            )
           ]),
       body: body(),
+      )),
       ),
-    );
+      );
   }
 }
