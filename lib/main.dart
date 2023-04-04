@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 
@@ -15,25 +14,24 @@ class Favoritos extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-      appBar: AppBar(
-        title: Text('Favoritos'),
-        actions: [
-          ElevatedButton(onPressed: () => Navigator.pop(context), child: Text('Voltar'))
-        ],
+        appBar: AppBar(
+          title: Text('Favoritos'),
+          actions: [
+            ElevatedButton(
+                onPressed: () => Navigator.pop(context), child: Text('Voltar'))
+          ],
+        ),
+        body: ListView.builder(
+            itemCount: saved.length,
+            itemBuilder: (context, index) {
+              return ListTile(
+                title: Text(saved[index].asPascalCase),
+              );
+            }),
       ),
-      body: ListView.builder(
-        itemCount: saved.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(saved[index].asPascalCase),
-          );
-        }
-          ),
-          ),
-       );
+    );
   }
 }
-
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -43,32 +41,29 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  
   final suggestions = <WordPair>[];
   final biggerFont = const TextStyle(fontSize: 18);
 
-
   String viewType = 'list';
 
-  lista_card(){
-    if (viewType == 'list'){
+  lista_card() {
+    if (viewType == 'list') {
       return const Text('Cards');
-    }else{
+    } else {
       return const Text('Lista');
     }
   }
 
-  botao(){
+  botao() {
     if (viewType == 'list') {
       viewType = 'grid';
-    }
-    else{
+    } else {
       viewType = 'list';
     }
     setState(() {});
   }
 
-  body(){
+  body() {
     if (viewType == 'list') {
       return ListView.builder(
         padding: const EdgeInsets.all(16.0),
@@ -81,39 +76,41 @@ class _MyAppState extends State<MyApp> {
           }
           final alreadySaved = saved.contains(suggestions[index]);
           return ListTile(
-              title: Container(
-                child: Dismissible(
-                  key: ObjectKey(suggestions[index].asPascalCase),
-                  child: Text(
-                    suggestions[index].asPascalCase,
-                    style: biggerFont,
-                  ),
-                  onDismissed: (direction) {
-                    setState(() {
-                    suggestions.removeAt(index);
-                    saved.removeAt(index);
-                     });  
-                  },
+            title: Container(
+              child: Dismissible(
+                key: ObjectKey(suggestions[index].asPascalCase),
+                child: Text(
+                  suggestions[index].asPascalCase,
+                  style: biggerFont,
                 ),
-              ),
-              trailing: IconButton(
-                icon: alreadySaved ? const Icon(Icons.favorite, color: Colors.red) : Icon(Icons.favorite_border),
-              onPressed: () {
-                setState(() {
-                  if (alreadySaved){
+                onDismissed: (direction) {
+                  setState(() {
                     saved.remove(suggestions[index]);
-                  } else {
-                    saved.add(suggestions[index]);
-                  }
-                });
-                }
+                    suggestions.removeAt(index);
+                  });
+                },
               ),
+            ),
+            trailing: IconButton(
+                icon: alreadySaved
+                    ? const Icon(Icons.favorite, color: Colors.red)
+                    : Icon(Icons.favorite_border),
+                onPressed: () {
+                  setState(() {
+                    if (alreadySaved) {
+                      saved.remove(suggestions[index]);
+                    } else {
+                      saved.add(suggestions[index]);
+                    }
+                  });
+                }),
           );
         },
       );
-    }
-    else{
-      return GridView.builder(gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+    } else {
+      return GridView.builder(
+        gridDelegate:
+            const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
         padding: const EdgeInsets.all(16.0),
         itemBuilder: /*1*/ (context, i) {
           if (i >= suggestions.length) {
@@ -121,13 +118,12 @@ class _MyAppState extends State<MyApp> {
           }
           // final alreadySaved = saved.contains(suggestions[i]);
           return Card(
-                child: Center(
-                  child: Text(
-                suggestions[i].asPascalCase,
-                style: biggerFont,
-                )
-                  ,)
-          );
+              child: Center(
+            child: Text(
+              suggestions[i].asPascalCase,
+              style: biggerFont,
+            ),
+          ));
         },
       );
     }
@@ -135,27 +131,29 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-
-
     return MaterialApp(
       home: Builder(
-        builder: ((context) => 
-      Scaffold(
-      appBar: AppBar(
-          title: const Text('Startup Name Generator'),
-          actions: [
-            ElevatedButton(
-              onPressed: botao,
-              child: lista_card(),
-            ),
-            IconButton(
-              icon: Icon(Icons.star, color: Colors.yellow,),
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const Favoritos())),
-            )
-          ]),
-      body: body(),
-      )),
+        builder: ((context) => Scaffold(
+              appBar:
+                  AppBar(title: const Text('Startup Name Generator'), actions: [
+                ElevatedButton(
+                  onPressed: botao,
+                  child: lista_card(),
+                ),
+                IconButton(
+                  icon: Icon(
+                    Icons.star,
+                    color: Colors.yellow,
+                  ),
+                  onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const Favoritos())),
+                )
+              ]),
+              body: body(),
+            )),
       ),
-      );
+    );
   }
 }
